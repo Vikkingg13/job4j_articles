@@ -4,5 +4,6 @@ import java.util.List;
 
 public interface Store<T> {
     T save(T model);
+    List<T> saveAll(List<T> models);
     List<T> findAll();
 }

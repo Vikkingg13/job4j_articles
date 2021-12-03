@@ -58,7 +58,7 @@ public class WordStore implements Store<Word>, AutoCloseable {
         LOGGER.info("Заполнение таблицы слов");
         try (var statement = connection.createStatement()) {
             var sql = Files.readString(Path.of("db/scripts", "words.sql"));
-            statement.executeLargeUpdate(sql);
+            statement.executeUpdate(sql);
         } catch (Exception e) {
             LOGGER.error("Не удалось выполнить операцию: { }", e.getCause());
             throw new IllegalStateException();
@@ -81,6 +81,11 @@ public class WordStore implements Store<Word>, AutoCloseable {
             throw new IllegalStateException();
         }
         return model;
+    }
+
+    @Override
+    public List<Word> saveAll(List<Word> models) {
+        return null;
     }
 
     @Override

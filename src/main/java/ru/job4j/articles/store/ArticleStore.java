@@ -11,6 +11,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 
@@ -72,11 +73,28 @@ public class ArticleStore implements Store<Article>, AutoCloseable {
     }
 
     @Override
+    public List<Article> saveAll(List<Article> models) {
+        LOGGER.info("Сохранение статей...");
+        try {
+            connection.setAutoCommit(false);
+            for (Article model : models) {
+                save(model);
+            }
+            connection.commit();
+        } catch (Exception e) {
+                LOGGER.error("Не удалось выполнить операцию: { }", e.getCause());
+                throw new IllegalStateException();
+        }
+        return models;
+    }
+
+    @Override
     public List<Article> findAll() {
         LOGGER.info("Загрузка всех статей");
         var sql = "select * from articles";
         var articles = new ArrayList<Article>();
         try (var statement = connection.prepareStatement(sql)) {
+            statement.setFetchSize(1000);
             var selection = statement.executeQuery();
             while (selection.next()) {
                 articles.add(new Article(
